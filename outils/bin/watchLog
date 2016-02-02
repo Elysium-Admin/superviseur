@@ -1,0 +1,2 @@
+#!/bin/sh
+watch -n 1 "tail -n 20 " /home/pi/Elysium/logs/Insight.log

@@ -1,0 +1,4 @@
+#!/bin/sh
+cp /home/pi/Elysium/logs/Insight.log ./tmp.log
+nano ./tmp.log
+rm -f ./tmp.log

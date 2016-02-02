@@ -1,0 +1,230 @@
+/*
+    ----------- Charte des couleurs --------------
+    #feedd8     crème très clair
+    #ffcf91     fond de page
+    #333        gris : pour les ombres
+    #5c3400     marron foncé : les boutons et les encadrements
+    #f6b26b     marron moyen : entête et pied de page
+    #fdf1e3     crème clair : les textes des boutons
+    #999        gris : pour les textes des boutons grisés
+    green       vert : les textes des états stables
+    #a05000     marron : les textes en action
+    red         rouge : les textes des états en panne
+    #43382e     le control video
+    #f7b074     header & footer (couleur du fond))
+
+    ATTENTION : pour les commentaires '//' ne marche pas !
+
+    Ce CSS place les éléments de manière absolue et adapté
+    uniquement à un écran de 1280x780
+
+    Version 0.31 - 15/04/2015    Auteur : 
+        Ajout du CSS pour #vidPopFilm
+    Version beta6 - 26/04/2015    Auteur : 
+        Ajout du CSS pour #imgEtatCamera
+    Version beta7 - 28/04/2015    Auteur : 
+        Config des boutons de la boite à outils (btnOutilsX)
+*/
+
+/* toutes les images ont une position fixe */
+img {position: fixed;}
+video {position: fixed;}
+/* ----------------------- Zone des Popup ----------------------- */
+div[data-role="popup"] { padding:2px 4px 2px 4px;}
+
+/* ne pas changer ses valeurs sans vérifier le pb d'ascenseur sur tablette */
+.ui-header { height:60px; box-shadow: 1px 1px 20px #222;}
+.ui-footer { height:40px;  box-shadow: 1px 1px 16px #000;}
+.ui-content { height:640px;}
+.ui-etat { height:65px;}       /* le bandeau des états du lander */
+.centrer {text-align: center;}  /* centrage d'un texte */
+.center-btn {
+    margin-top: 16px;
+    margin-bottom: 16px;
+    margin-left:auto;
+    margin-right:auto;       /* met de la place autour des boutons */
+}   /* centrage d'un bouton */
+.show {display : block;}
+.hide {display : none;}
+.ui-btn {font-size: 20px; box-shadow: 1px 1px 8px #333;} /* ombre portée */
+
+
+#lblTitre,#lblSousTitre,#divGraphe,#lblX,#lblY,#lblZ,#tableTest_P2,#tableInit_P3,
+#divBatterieFond,#divBatterieCharge,#lblBatterie,#btnMain_P1,#btnQuitter_P1,
+#btnMain_P5,#lblPanneau1,#msgPanneau1,#lblPanneau2,#msgPanneau2,
+#lblSEIS,#msgSEIS,#lblHP3,#msgHP3,#lblWTS,#msgWTS,#lblBras,#msgBras,#lblPince,#msgPince,
+#lblPanneau1_P5,#msgPanneau1_P5,#lblPanneau2_P5,#msgPanneau2_P5,
+#lblSEIS_P5,#msgSEIS_P5,#lblHP3_P5,#msgHP3_P5,#lblWTS_P5,#msgWTS_P5,#lblBras_P5,#msgBras_P5,#lblPince_P5,#msgPince_P5,
+#btnPanneaux,#btnHP3,#btnSEIS,#btnWTS,#btnQuitter,#video,
+#btnARU,#btnARU_P3,#btnARU_P5,#lblARU,#lblARU_P3,#lblARU_P5,#divFilm,#cmdFilm { 
+    position: fixed;         /* évite le pb d'ascenseur sur tablette */
+}
+
+/* tableau des tests et des inits */
+#tableTest_P2, #tableInit_P3 { width:600px; left: 340px;}
+#tabResultat_P2, #tabResultat_P3 { width:60px;}
+#tdOK { text-align: center; border: 1px solid #DDD; }
+#tdOK[st="0"] { background-color: orange; color: white;}
+#tdOK[st="1"] { background-color: green; color: white;}
+#tdOK[st="2"] { background-color: red; color: white;}
+
+/* ----------------------- Zone de l'entête ----------------------- */
+#imgNasa { top : 6px; left : 35px; }
+#imgCnes { top : 6px; left : 160px; }
+#imgElysium { top : 2px; left : 820px; }
+#lblTitre { top : -4px; left : 550px; font-size: 40px; }
+#lblSousTitre { top : 38px; left : 555px; font-size: 20px; }
+#imgAcToulouse { top : 2px; left : 360px; }
+#imgEnCours { top : 15px; left : 1110px; width:60px; height:30px; display:none }
+#imgLangue { 
+    top: 15px; left: 954px; width: 54px; height: 28px;
+    border: 1px solid #5c3400;
+    /* box-shadow: 1px 1px 3px #333;    /* ombre portée derrière les boutons */
+}
+#imgOutils {
+    top : 15px; left : 1036px;
+    height: 30px;
+}
+#imgEtatCamera {
+    top : 15px; left : 1110px;
+    width: 60px; height: 30px;
+}
+#imgBatterie { top : 15px; left : 1195px; }
+#divBatterieFond,#divBatterieCharge {
+    top : 19px; left : 1199px; 
+    width:58px; height:22px;
+}
+#divBatterieFond { background-color: #feedd8;}
+#divBatterieCharge { background-color: green;}
+#lblBatterie { top : 45px; left : 1195px; font-size: 16px; }
+
+/* ------------------- Zone des états du lander ------------------- */
+#msgPanneau1,#msgPanneau2,#msgSEIS,#msgWTS,#msgHP3,#msgBras,#msgPince,
+#msgPanneau1_P5,#msgPanneau2_P5,#msgSEIS_P5,#msgWTS_P5,#msgHP3_P5,#msgBras_P5,#msgPince_P5 {
+    color: green;                   /* les messages sont vert par défaut */
+}
+#msgInfo { color: #5c3400;}     /* messages d'action */
+    
+#lblPanneau1,#lblPanneau1_P5 { top : 70px; left : 10px; }
+#msgPanneau1,#msgPanneau1_P5 { top : 70px; left : 125px; }
+#lblPanneau2,#lblPanneau2_P5 { top : 100px; left : 10px; }
+#msgPanneau2,#msgPanneau2_P5 { top : 100px; left : 125px; }
+
+#lblSEIS,#lblSEIS_P5 { top : 70px; left : 440px; }
+#msgSEIS,#msgSEIS_P5 { top : 70px; left : 500px; }
+#lblWTS,#lblWTS_P5 { top : 100px; left : 440px; }
+#msgWTS,#msgWTS_P5 { top : 100px; left : 500px; }
+
+#lblHP3,#lblHP3_P5 { top : 70px; left : 790px; }
+#msgHP3,#msgHP3_P5 { top : 70px; left : 860px; }
+#lblBras,#lblBras_P5 { top : 100px; left : 790px; }
+#msgBras,#msgBras_P5 { top : 100px; left : 860px; }
+
+#lblPince,#lblPince_P5 { top : 70px; left : 1140px; }
+#msgPince,#msgPince_P5 { top : 100px; left : 1140px; }
+
+#lblPanneau1,#msgPanneau1,#lblPanneau2,#msgPanneau2,
+#lblSEIS,#msgSEIS,#lblWTS,#msgWTS,#lblPince,#msgPince,
+#lblHP3,#msgHP3,#lblBras,#msgBras,
+#lblPanneau1_P5,#msgPanneau1_P5,#lblPanneau2_P5,#msgPanneau2_P5,
+#lblSEIS_P5,#msgSEIS_P5,#lblWTS_P5,#msgWTS_P5,#lblPince_P5,#msgPince_P5,
+#lblHP3_P5,#msgHP3_P5,#lblBras_P5,#msgBras_P5 { 
+    font-size: 23px;
+}
+
+/* ---------------- Zone de la ligne d'information ----------------------- */
+#msgInfo {text-align : center; margin-top: 5px; font-weight: bold; font-size: 24px;}
+
+/* ---------------------------- Zone vidéo ---------------------------- */
+#vidFilm {
+    top : 135px; left : 240px;
+    width : 800px; height : 450px;  /* 800px ou 675px */
+    border: 2px solid #5c3400;
+    background-color: #f6b26b;
+}
+
+#vidPopFilm {
+    top : 130px; left : 160px;
+    width : 960px; height : 540px;  /* 800px ou 675px */
+    border: 2px solid #5c3400;
+    background-color: #f6b26b;
+}
+
+#cmdFilm {
+    top : 220px; left : 510px;
+}
+
+#imgCamera {                        /* 720*480 */
+    top : 135px; left : 320px;
+    width : 675px; height : 450px;  /* 800px ou 675px */
+    border: 2px solid #5c3400;
+    background-color: #f6b26b;
+}
+
+/* --------------------------- Zone des graphes ----------------------- */
+/* les graphes se superposent, un seul doit être affiché à tout instant */
+#divGraphe {
+    top : 135px; left : 705px;
+    width : 560px; height : 450px;
+    border: 2px solid #5c3400;
+    background-color: #fdf1e3;
+}
+
+#lblX { top : 180px;}
+#lblY { top : 330px;}
+#lblZ { top : 480px;}
+#lblX,#lblY,#lblZ { left : 1230px; font-size: 26px;}
+
+/* ----------------------- Zone des commandes ----------------------- */
+#btnPanneaux,#btnHP3,#btnSEIS,#btnWTS,#btnQuitter { width: 240px; }
+
+#btnPanneaux { top : 590px; left : 100px; }
+#btnHP3 { top : 654px; left : 100px; }
+#btnSEIS { top : 590px; left : 370px; }
+#btnWTS { top : 654px; left : 370px; }
+#btnQuitter { top : 620px; left : 940px; }
+#btnARU {
+    top : 600px; left : 720px;
+    border-radius: 30px;
+}
+#lblARU { top : 702px; left : 660px; font-size: 24px; }
+#lblARU_P3,#lblARU_P5 { 
+    top : 405px; left : 935px; font-size: 24px; 
+}
+#btnARU_P3,#btnARU_P5 {
+    top : 300px; left : 1000px;
+    border-radius: 30px;
+}
+
+/* --------------------- Boutons des Popup ---------------------- */
+#btnPopFrancais,#btnPopAnglais,#btnPopEspagnol,#btnPopAllemand,
+#btnPopDecisionOK,#btnPopDecisionNO,#btnPopCommandeOK,#btnPopCommandeNO,
+#btnDepannageDecisionOK,#btnDepannageDecisionNO,
+#btnPopVideoShowGraphe,#btnPopHideVideo,#btnPopVideoHideVideo,#btnPopVideoChangeVue,
+#btnPopHideGraphe,#btnPopChangeVue,#btnPopGrapheReset,#btnPopGrapheStart,
+#btnPopVideoPanneaux,#btnPopVideoSEIS,#btnPopVideoWTS,#btnPopVideoHP3,
+#btnPopRepliPieds,#btnPopNivellement,
+#btnOutils1,#btnOutils2,#btnOutils3,#btnOutils4,#btnOutils5,#btnOutils6,
+#btnOutils7,#btnOutils8 {
+    width: 340px;
+    margin : 16px 8px 16px 8px;
+}
+
+#btnCmdVideoChangeVue,#btnCmdVideoPanneaux,#btnCmdVideoSEIS,#btnCmdVideoWTS,
+#btnCmdVideoHP3,#btnCmdVideoHideVideo,#btnCmdVideoShowGraphe {
+    width: 240px;
+    margin : 10px 8px 10px 8px;
+}
+#btnPopAruOK,#btnPopConfirm,#btnPopPbNivellement { width: 340px; }
+#btnCache1,#btnCache2 { width: 40px;}
+
+/* ---------------------------- Pages 1, 5 ---------------------------- */
+#btnMain_P5 { top : 550px; left : 470px; width: 340px;}
+#btnMain_P1 { top : 450px; left : 680px; width: 340px;}
+#btnQuitter_P1 { top : 450px; left : 300px; width: 340px;}
+
+#btnDep11,btnDep12,btnDep13,btnDep21,btnDep22,btnDep23 { 
+    position : fixed;
+    width: 340px;
+    margin : 16px 8px 16px 30px;
+};

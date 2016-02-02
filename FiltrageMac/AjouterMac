@@ -1,0 +1,12 @@
+#! /bin/bash
+DIR_FILTRE="/home/pi/Elysium/FiltrageMac"
+#Vérification que la variable sois bien une adresse MAC
+if [[ $1 =~ ^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$ ]]
+then
+	#On écrit l'adresse MAC dans le fichier
+	echo -e $1  | tr '[:upper:]' '[:lower:]' >> $DIR_FILTRE/MacAuthorisees
+	iptables -A INPUT -p tcp -m tcp --dport 2015 -j ACCEPT -m mac --mac-source $1
+	echo "Adresse MAC ajoutée avec succès dans "$DIR_FILTRE"/MacAuthorisees"
+else 
+	echo "Le format est incorrect"
+fi 

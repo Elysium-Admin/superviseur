@@ -1,0 +1,295 @@
+<!--
+    Page de gestion de la réplique INSIGHT coordonnée par un serveur
+    pour la mise à jour de l'état de l'IHM et des graphes.
+    Fichier de site unique basé sur le modèle proposé par JQuery Mobile.
+    Composé de 5 pages avec header, main et footer. 
+    La page 4 est la page principale.
+    Le header et le footer sont globaux, donc identique aux 5 pages.
+    Les popups sont globales (partagées par toutes les pages).
+
+    Remarque : L'initialisation des header, footer et popups globales se fait 
+    par le javascript suivant :
+        $("[data-role='header'], [data-role='footer']").toolbar();
+        $("[data-role='popup']").popup().enhanceWithin();
+
+    Remarque : Dans cette page, il n'y aucun lien. Tous les liens sont créés
+    par association de clic sur des éléments et initialisés dans 'elysium.js'.
+    
+    Remarque : La mise à jour de l'IHM, des graphes et l'ouvertures de certaines
+    popups se fait par réception d'une trame 'etat' et d'une trame vibration' 
+    par SSE.
+
+    Remarque : La caméra est en liaison directe.
+
+    Version du JQ  : 1.11.2
+    Version du JQM : 1.4.5
+    Version du CanvasJS : v1.6.0
+
+    La librairie MultiLangue est une adaptation d'un source 
+    trouvé sur 'https://github.com/dakk/jquery-multilang'.
+
+    Pour le sous titre : on a mis des espace inseccable par :
+        alt+0160 dans windows
+        alt+espace sur Mac OS X
+
+    BTS IRIS du Lycée Victor Hugo de Colomiers
+
+    Version 0.27 - 02/04/2015   Auteur : BUGE Pascal / Mr DUMAS
+        Création de la version publique
+
+    Version 0.31 - 15/04/2015    Auteur : CAMPI Enzo / Mr DUMAS
+        Ajout du film de présentation sur pages 1,2,3 & 5
+
+    Version 0.32 - 25/04/2015    Auteur : BUGE Pascal
+        Ajout des états sur page5
+
+    Beta7 - 28/04/2015    Auteur : BUGE Pascal
+        Ajout d'une popup spécifique pour ARU matérielle
+
+-->
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Elysium</title>   
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+        <link rel="apple-touch-icon" href="images/apple-touch-icon-57x57.png"/>
+        <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png"/>
+        <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png"/>
+        <link rel="icon" href="images/apple-touch-icon-57x57.png" />
+        
+        <link rel="stylesheet" href="css/jquery.mobile-1.4.5.css">
+        <link rel="stylesheet" href="themes/elysiumThemeV3.min.css" />
+        <link rel="stylesheet" href="css/elysiumPublic.css">
+        <script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery.mobile-1.4.5.js"></script>
+        <script type="text/javascript" src="js/canvasjs.min.js"></script>
+        <script type="text/javascript" src="js/CBatterie.js"></script>
+        <script type="text/javascript" src="js/CIhm.js"></script>
+        <script type="text/javascript" src="js/LGraphes.js"></script>
+        <script type="text/javascript" src="js/LStreamPublic.js"></script>
+        <script type="text/javascript" src="js/LMultiLangue.js"></script>
+        <!-- A mettre en dernier -->
+        <script type="text/javascript" src="js/elysiumPublic.js"></script>
+    </head>
+
+    <body>
+<!--
+    ======================================
+                header global
+    ======================================
+--> 
+    <div data-role="header" data-position="fixed" data-tap-toggle="false" 
+                                        data-fullscreen="false" data-theme="a">
+        <div>
+            <img id="imgLangue" src="images/drapeau_fr.png" class="ui-btn-left"/>
+            <label id="lblTitre" class="centrer">ELYSIUM</label>
+            <img id="imgEtatCamera" src="images/cameraverte.png" alt="camera" />
+            <div id="divBatterie">
+                <img id="imgBatterie" src="images/batterie.png" class="ui-btn-right"/>
+                <div id="divBatterieFond"></div>
+                <div id="divBatterieCharge"></div>
+                <label id="lblBatterie" class="ui-btn-right heure">00h00</label>
+            </div>
+        </div>
+    </div>
+
+<!--
+    ======================================
+                footer global
+    ======================================
+--> 
+    <div data-role="footer" data-tap-toggle="false" data-fullscreen="false" 
+                                                                data-theme="a">
+        <div>
+            <label id="msgInfo"></label>
+        </div>
+    </div>
+    
+<!--
+    ======================================
+                page 1 d'attente
+    ======================================
+--> 
+    <div data-role="page" id="page1">
+        <div data-role="main" class="ui-content">
+            <br/><br/><br/><br/><br/><br/>
+            <h1 id="lblMain_P1" st class="centrer"></h1>
+        </div>
+    </div>
+    
+<!--
+    ======================================
+                page 2 des tests
+    ======================================
+--> 
+    <div data-role="page" id="page2">
+        <div data-role="main" class="ui-content">
+            <br/>
+            <h1 id="lblMain_P2" st class="centrer"></h1>
+            <table id="tableTest_P2" data-role="table"
+                        class="ui-body-a ui-shadow table-stripe ui-responsive">
+                <thead>
+                    <tr class="ui-bar-a">
+                        <th id="tabMsg_P2" st></th>
+                        <th id="tabResultat_P2" st></th>
+                    </tr>
+                </thead>
+                <tbody id="tbdTest_P2">
+                    <!-- on ajoute ici les comptes rendus de tests -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+<!--
+    ======================================
+            page 3 des initialisations
+    ======================================
+--> 
+    <div data-role="page" id="page3">
+        <div data-role="main" class="ui-content">
+            <br/>
+            <h1 id="lblMain_P3" st class="centrer"></h1>
+            <table id="tableInit_P3" data-role="table"
+                        class="ui-body-a ui-shadow table-stripe ui-responsive">
+                <thead>
+                    <tr class="ui-bar-a">
+                        <th id="tabMsg_P3" st></th>
+                        <th id="tabResultat_P3" st></th>
+                    </tr>
+                </thead>
+                <tbody id="tbdInit_P3">
+                    <!-- on ajoute ici les comptes rendus d'init -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+<!--
+    ======================================
+            page 4 principale
+    ======================================
+--> 
+    <div data-role="page" id="page4">
+        <div role="main" class="ui-content">
+            <div class="ui-etat" id="main-etat">
+                <label id="lblPanneau1" st></label>
+                <label id="msgPanneau1" st="0"></label><br/>
+                <label id="lblPanneau2" st></label>
+                <label id="msgPanneau2" st="0"></label><br/>
+                <label id="lblSEIS" st></label>
+                <label id="msgSEIS" st="0"></label><br/>
+                <label id="lblHP3" st></label>
+                <label id="msgHP3" st="0"></label><br/>
+                <label id="lblWTS" st></label>
+                <label id="msgWTS" st="0"></label><br/>
+                <label id="lblBras" st></label>
+                <label id="msgBras" st="0"></label><br/>
+                <label id="lblPince" st></label>
+                <label id="msgPince" st="0"></label><br/>
+            </div>
+            <div id="main-visu">
+                <img id="imgCamera" src="images/lander.jpg" alt="Camera HS"/>
+                <div id="divGraphe" class="show">
+                    <div id="div3Graphes" class="show">
+                        <div id="divChartX" style="height: 100px; width:90%;"> </div>
+                        <div id="divChartY" style="height: 100px; width:90%;"> </div>
+                        <div id="divChartZ" style="height: 100px; width:90%;"> </div>
+                    </div>
+                    <div id="divGrapheXYZ" class="hide">
+                        <div id="divChartXYZ" style="height: 300px; width:100%;"> </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!--
+    ======================================
+            page 5 de cloture
+    ======================================
+-->   
+    <div data-role="page" id="page5">
+        <div data-role="main" class="ui-content">
+            <div class="ui-etat" id="etat_P5">
+                <label id="lblPanneau1_P5" st></label>
+                <label id="msgPanneau1_P5" st="11"></label><br/>
+                <label id="lblPanneau2_P5" st></label>
+                <label id="msgPanneau2_P5" st="0"></label><br/>
+                <label id="lblSEIS_P5" st></label>
+                <label id="msgSEIS_P5" st="0"></label><br/>
+                <label id="lblHP3_P5" st></label>
+                <label id="msgHP3_P5" st="0"></label><br/>
+                <label id="lblWTS_P5" st></label>
+                <label id="msgWTS_P5" st="0"></label><br/>
+                <label id="lblBras_P5" st></label>
+                <label id="msgBras_P5" st="0"></label><br/>
+                <label id="lblPince_P5" st></label>
+                <label id="msgPince_P5" st="0"></label><br/>
+            </div>
+            <div id="visu_P5">
+                <br/><br/><br/>
+                <h1 id="lblMain_P5" st class="centrer"></h1>
+            </div>
+        </div>
+    </div>
+
+<!--
+    ==========================================
+     popup globales avec ouverture modale
+    ==========================================
+-->
+    <div id="popARU" data-role="popup" data-dismissible="false" 
+                                       data-theme="c" data-overlay-theme="c"> 
+        <h1 id="msgPopARU" st="0" class="centrer"></h1><br/>
+        <div id="txtPopARU" st="0" class="centrer"></div><br/>
+        <br/>
+    </div>
+<!--
+    ==========================================
+     popup globales avec ouverture non modale
+    ==========================================
+-->  
+    <div id="popInfoBatterie" data-role="popup" data-theme="a">
+        <div class="centrer">
+        <h1 id="msgPopBatterie" st></h1><br/>
+        <span id="lblTensionBatteries" st></span>
+        <span id="lblValeurTensionBatteries"></span>V<br/>
+        <span id="lblChargeBatteries" st></span>
+        <span id="lblValeurChargeBatteries"></span>%<br/>
+        <span id="lblCourantBatteries" st></span>
+        <span id="lblValeurCourantBatteries"></span>A<br/>
+        <span id="lblChargeConsommees" st></span>
+        <span id="lblValeurChargeConsommees"></span>%<br/>
+        <span id="lblDureeRestanteBatteries" st></span>
+        <span id="lblValeurDureeRestanteBatteries"></span><br/>
+        <span id="lblCodeIncidentEnergie" st></span>
+        <span id="lblValeurCodeIncidentEnergie"></span><br/><br/>
+        </div>
+    </div>
+
+    <div id="popLangue" data-role="popup" data-theme="a">
+        <h1 id="msgPopLangue" st class="centrer"></h1><br/>
+        <button id="btnPopFrancais" class="ui-btn ui-btn-b">Français</button>
+        <button id="btnPopAnglais" class="ui-btn ui-btn-b">English</button>
+        <button id="btnPopEspagnol" class="ui-btn ui-btn-b">Español</button>
+        <button id="btnPopAllemand" class="ui-btn ui-btn-b">Deutsch</button>
+    </div>
+
+    <div id="popCamera" data-role="popup" data-position-to="#imgCamera" data-theme="a">
+        <button id="btnPopCameraShowGraphe" st="1" class="ui-btn ui-btn-b"></button>
+    </div>
+
+    <div id="popGraphes" data-role="popup" data-position-to="#divGraphe" data-theme="a">
+        <button id="btnPopChangeVue" st class="ui-btn ui-btn-b"></button>
+        <button id="btnPopGrapheReset" st class="ui-btn ui-btn-b"></button>
+        <button id="btnPopGrapheStart" st="0" class="ui-btn ui-btn-b"></button>
+        <button id="btnPopHideVideo" st="3" class="ui-btn ui-btn-b"></button>
+    </div>
+    </body>
+</html>

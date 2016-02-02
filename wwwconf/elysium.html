@@ -1,0 +1,521 @@
+<!--
+    Pour écran 1280x780
+    Page de gestion de la réplique INSIGHT coordonnée par un serveur
+    pour la mise à jour de l'état de l'IHM et des graphes.
+    Fichier de site unique basé sur le modèle proposé par JQuery Mobile.
+    Composé de 5 pages avec header, main et footer. 
+    La page 4 est la page principale.
+    Le header et le footer sont globaux, donc identique aux 5 pages.
+    Les popups sont globales (partagées par toutes les pages).
+
+    Remarque : L'initialisation des header, footer et popups globales se fait 
+    par le javascript suivant :
+        $("[data-role='header'], [data-role='footer']").toolbar();
+        $("[data-role='popup']").popup().enhanceWithin();
+
+    Remarque : Dans cette page, il n'y aucun lien. Tous les liens sont créés
+    par association de clic sur des éléments et initialisés dans 'elysium.js'.
+    
+    Remarque : La mise à jour de l'IHM, des graphes et l'ouvertures de certaines
+    popups se fait par réception d'une trame 'etat' et d'une trame vibration' 
+    par SSE.
+
+    Remarque : La caméra est en liaison directe.
+
+    Version du JQ  : 1.11.2
+    Version du JQM : 1.4.5
+    Version du CanvasJS : v1.6.0
+
+    La librairie MultiLangue est une adaptation d'un source 
+    trouvé sur 'https://github.com/dakk/jquery-multilang'.
+
+    Pour le sous titre : on a mis des espace inséccable par :
+        alt+0160 dans windows
+        alt+espace sur Mac OS X
+
+    Organisme : Lycée International Victor Hugo Colomiers, BTS IRIS
+    Chef de projet : J.Voyé, JP.Dumas
+
+    Version 0.23 - 02/2015      Auteur : BUGE Pascal
+        Ajout de l'état de la pince
+        Déplacement de l'icône batterie dans l'entête
+        Correction bug incohérence entre état des sous-systèmes et les boutons
+
+    Version 0.27 - 02/04/2015   Auteur : BUGE Pascal
+        Ajout des commandes de mise à jour des IHM à distance
+        renommage des id des popup d'info de 'popXXX' en 'popInfoXXX'
+
+    Version 0.31 - 15/04/2015    Auteur : CAMPI Enzo / Mr DUMAS
+        Ajout du film de présentation sur pages 1,2,3 & 5
+
+    Version 0.32 - 25/04/2015    Auteur : BUGE Pascal
+        Ajout des états sur page5
+
+    Version beta3 - 25/04/2015    Auteur : BUGE Pascal
+        Ajout d'un panel de dépannage sur la popup de la Nasa
+
+    Version beta5 - 25/04/2015    Auteur : BUGE Pascal
+        Correction de petits bugs
+        Ajout icone caméra et repositionnement des icônes de l'entête
+
+    Beta7 - 28/04/2015    Auteur : BUGE Pascal
+        Ajout d'une popup spécifique pour ARU matérielle
+  
+-->
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>Elysium</title>   
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <meta name="apple-mobile-web-app-capable" content="yes"/>
+        <meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+        <link rel="apple-touch-icon" href="images/apple-touch-icon-57x57.png"/>
+        <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png"/>
+        <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png"/>
+        <link rel="icon" href="images/apple-touch-icon-57x57.png" />
+
+        <link rel="stylesheet" href="css/jquery.mobile-1.4.5.css">
+        <link rel="stylesheet" href="themes/elysiumThemeV3.min.css" />
+        <link rel="stylesheet" href="css/elysium.css">
+        <script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery.mobile-1.4.5.js"></script>
+        <script type="text/javascript" src="js/canvasjs.min.js"></script>
+        <script type="text/javascript" src="js/CBatterie.js"></script>
+        <script type="text/javascript" src="js/CIhm.js"></script>
+        <script type="text/javascript" src="js/LGraphes.js"></script>
+        <script type="text/javascript" src="js/LCommandes.js"></script>
+        <script type="text/javascript" src="js/LStream.js"></script>
+        <script type="text/javascript" src="js/LMultiLangue.js"></script>
+        <!-- A mettre en dernier -->
+        <script type="text/javascript" src="js/elysium.js"></script>
+    </head>
+
+    <body>
+<!--
+    ======================================
+                header global
+    ======================================
+--> 
+    <div data-role="header" data-position="fixed" data-tap-toggle="false" 
+                                        data-fullscreen="false" data-theme="a">
+        <div>
+            <img id="imgNasa" src="images/nasaJPL.png" alt="nasa" />
+            <img id="imgCnes" src="images/cnes.png" alt="cnes" />
+            <img id="imgAcToulouse" src="images/acToulouse.png" alt="acToulouse" />
+            <label id="lblTitre">ELYSIUM</label>
+            <label id="lblSousTitre" st></label>
+            <img id="imgElysium" src="images/elysium.png" alt="elysium" />
+            <img id="imgLangue" src="images/drapeau_fr.png" alt="fr" />
+            <img id="imgOutils" src="images/outils.png" alt="outils" />
+            <img id="imgEtatCamera" src="images/cameraverte.png" alt="camera" />
+            <div id="divBatterie">
+                <img id="imgBatterie" src="images/batterie.png" alt="batterie" />
+                <div id="divBatterieFond"></div>
+                <div id="divBatterieCharge"></div>
+                <label id="lblBatterie"></label>
+            </div>
+        </div>
+    </div>
+
+<!--
+    ======================================
+                footer global
+    ======================================
+--> 
+    <div data-role="footer" data-tap-toggle="false" data-fullscreen="false" 
+                                                                data-theme="a">
+        <div>
+            <label id="msgInfo"></label>
+        </div>
+    </div>
+    
+<!--
+    ======================================
+                page 1 d'attente
+    ======================================
+--> 
+    <div data-role="page" id="page1">
+        <div data-role="main" class="ui-content">
+            <br/><br/><br/><br/><br/><br/>
+            <h1 id="lblMain_P1" st class="centrer"></h1>
+            <button id="btnMain_P1" st class="ui-btn ui-btn-b btnCmd"></button>
+            <button id="btnQuitter_P1" st class="ui-btn ui-btn-b btnCmd"></button>
+        </div>
+    </div>
+    
+<!--
+    ======================================
+                page 2 des tests
+    ======================================
+--> 
+    <div data-role="page" id="page2">
+        <div data-role="main" class="ui-content">
+            <br/><br/>
+            <h1 id="lblMain_P2" st class="centrer"></h1>
+            <table id="tableTest_P2" data-role="table"
+                        class="ui-body-a ui-shadow table-stripe ui-responsive">
+                <thead>
+                    <tr class="ui-bar-a">
+                        <th id="tabMsg_P2" st></th>
+                        <th id="tabResultat_P2" st></th>
+                    </tr>
+                </thead>
+                <tbody id="tbdTest_P2">
+                    <!-- on ajoute ici les comptes rendus de tests -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+<!--
+    ======================================
+            page 3 des initialisations
+    ======================================
+--> 
+    <div data-role="page" id="page3">
+        <div data-role="main" class="ui-content">
+            <br/><br/>
+            <h1 id="lblMain_P3" st class="centrer"></h1>
+            <table id="tableInit_P3" data-role="table"
+                        class="ui-body-a ui-shadow table-stripe ui-responsive">
+                <thead>
+                    <tr class="ui-bar-a">
+                        <th id="tabMsg_P3" st></th>
+                        <th id="tabResultat_P3" st></th>
+                    </tr>
+                </thead>
+                <tbody id="tbdInit_P3">
+                    <!-- on ajoute ici les comptes rendus d'init -->
+                </tbody>
+            </table>
+            <img id="btnARU_P3" src="images/aru.png" alt="btnARU" />
+            <label id="lblARU_P3" st></label>
+        </div>
+    </div>
+
+<!--
+    ======================================
+            page 4 principale
+    ======================================
+--> 
+    <div data-role="page" id="page4">
+        <div role="main" class="ui-content">
+            <div class="ui-etat" id="main-etat">
+                <label id="lblPanneau1" st></label>
+                <label id="msgPanneau1" st="0"></label>
+                <label id="lblPanneau2" st></label>
+                <label id="msgPanneau2" st="0"></label>
+                <label id="lblSEIS" st></label>
+                <label id="msgSEIS" st="0"></label>
+                <label id="lblHP3" st></label>
+                <label id="msgHP3" st="0"></label>
+                <label id="lblWTS" st></label>
+                <label id="msgWTS" st="0"></label>
+                <label id="lblBras" st></label>
+                <label id="msgBras" st="0"></label>
+                <label id="lblPince" st></label>
+                <label id="msgPince" st="0"></label>
+            </div>
+            <div id="main-visu">
+                <img id="imgCamera" src="images/lander.jpg" class="hide" alt="Camera non connectée"/>
+                <video id="vidFilm" controls class="show" preload="auto">
+                    <source src="images/elysiumfilm.mp4" type="video/mp4">
+                </video>
+                <div id="divGraphe" class="show">
+                    <div id="div3Graphes" class="show">
+                        <div id="divChartX" style="height: 150px; width:90%;"> </div>
+                        <div id="divChartY" style="height: 150px; width:90%;"> </div>
+                        <div id="divChartZ" style="height: 150px; width:90%;"> </div>
+                        <label id="lblX">X</label>
+                        <label id="lblY">Y</label>
+                        <label id="lblZ">Z</label>
+                    </div>
+                    <div id="divGrapheXYZ" class="hide">
+                        <div id="divChartXYZ" style="height: 450px; width:100%;"> </div>
+                    </div>
+                </div>
+            </div>
+            <div id="ui-commandes" >
+                <button id="btnPanneaux" st="0" class="ui-btn ui-btn-b btnCmd"></button>
+                <button id="btnHP3" st="0" class="ui-btn ui-btn-b btnCmd"></button>
+                <button id="btnSEIS" st="0" class="ui-btn ui-btn-b btnCmd" ></button>
+                <button id="btnWTS" st="0" class="ui-btn ui-btn-b btnCmd"></button>
+                <img id="btnARU" src="images/aru.png" alt="btnARU" />
+                <label id="lblARU" st></label>
+                <button id="btnQuitter" st="0" class="ui-btn ui-btn-b btnCmd"></button>
+            </div>
+        </div>
+    </div>
+
+<!--
+    ======================================
+            page 5 de cloture
+    ======================================
+-->   
+    <div data-role="page" id="page5">
+        <div data-role="main" class="ui-content">
+            <div class="ui-etat" id="etat_P5">
+                <label id="lblPanneau1_P5" st></label>
+                <label id="msgPanneau1_P5" st="0"></label>
+                <label id="lblPanneau2_P5" st></label>
+                <label id="msgPanneau2_P5" st="0"></label>
+                <label id="lblSEIS_P5" st></label>
+                <label id="msgSEIS_P5" st="0"></label>
+                <label id="lblHP3_P5" st></label>
+                <label id="msgHP3_P5" st="0"></label>
+                <label id="lblWTS_P5" st></label>
+                <label id="msgWTS_P5" st="0"></label>
+                <label id="lblBras_P5" st></label>
+                <label id="msgBras_P5" st="0"></label>
+                <label id="lblPince_P5" st></label>
+                <label id="msgPince_P5" st="0"></label>
+            </div>
+            <br/><br/><br/>
+            <h1 id="lblMain_P5" st class="centrer"></h1>
+            <img id="btnARU_P5" src="images/aru.png" alt="btnARU" />
+            <label id="lblARU_P5" st></label>
+        </div>
+    </div>
+
+<!--
+    ======================================
+        page 6 Fermer l'application
+    ======================================
+--> 
+    <div data-role="page" id="page6">
+        <div data-role="main" class="ui-content">
+            <br/><br/><br/><br/><br/><br/>
+            <h1 id="lblMain_P6" st class="centrer"></h1>
+        </div>
+    </div>
+
+<!--
+    ==================================================================
+     popup globales avec ouverture modale activés par la trame d'état
+    ==================================================================
+-->
+    <div id="popConfirm" data-role="popup" data-dismissible="false" 
+                                           data-theme="a" data-overlay-theme="a">
+        <h1 id="msgPopConfirm" st="0" class="centrer"></h1><br/>
+        <button id="btnPopConfirm" st class="ui-btn ui-btn-b center-btn" ></button>
+        <br/><br/>
+        <button id="btnPopPbNivellement" st class="hide ui-btn ui-btn-b center-btn" ></button>
+        <fieldset id="fldPopConfirm" class="hide ui-grid-a">
+            <div class="ui-block-a">
+                <button id="btnPopRepliPieds" st class="ui-btn ui-btn-b center-btn" ></button>
+            </div>
+            <div class="ui-block-b">
+                <button id="btnPopNivellement" st class="ui-btn ui-btn-b center-btn" ></button>
+            </div>
+        </fieldset>
+        <br/>
+    </div>
+
+    <div id="popDecision" data-role="popup" data-dismissible="false" 
+                                        data-theme="a" data-overlay-theme="a">
+        <h1 id="msgPopDecision" st="0" class="centrer"></h1><br/>
+        <fieldset class="ui-grid-a">
+            <div class="ui-block-a">
+                <button id="btnPopDecisionOK" st class="ui-btn ui-btn-b" ></button>
+            </div>
+            <div class="ui-block-b">
+                <button id="btnPopDecisionNO" st class="ui-btn ui-btn-b" ></button>
+            </div>
+        </fieldset>
+    </div>
+    
+    <div id="popARU" data-role="popup" data-dismissible="false" 
+                                        data-theme="c" data-overlay-theme="c"> 
+        <h1 id="msgPopARU" st="0" class="centrer"></h1><br/>
+        <div id="txtPopARU" st="0" class="centrer"></div><br/>
+        <button id="btnPopAruOK" st class="ui-btn ui-btn-d center-btn" ></button>
+        <br/>
+    </div>
+    
+<!--
+    ========================================================
+     popup globales d'information avec ouverture non modale
+    ========================================================
+-->    
+    <div id="popDepannageDecision" data-role="popup"
+                                        data-theme="a" data-overlay-theme="a">
+        <h1 id="msgDepannageDecision" st="0" class="centrer"></h1><br/>
+        <fieldset class="ui-grid-a">
+            <div class="ui-block-a">
+                <button id="btnDepannageDecisionOK" class="ui-btn ui-btn-b">OUI</button>
+            </div>
+            <div class="ui-block-b">
+                <button id="btnDepannageDecisionNO" class="ui-btn ui-btn-b">NON</button>
+            </div>
+        </fieldset>
+    </div>
+
+    <div id="popInfoBatterie" data-role="popup" data-theme="a">
+        <div class="centrer">
+        <h1 id="msgPopBatterie" st></h1><br/>
+        <span id="lblTensionBatteries" st></span>
+        <span id="lblValeurTensionBatteries"></span>V<br/>
+        <span id="lblChargeBatteries" st></span>
+        <span id="lblValeurChargeBatteries"></span>%<br/>
+        <span id="lblCourantBatteries" st></span>
+        <span id="lblValeurCourantBatteries"></span>A<br/>
+        <span id="lblChargeConsommees" st></span>
+        <span id="lblValeurChargeConsommees"></span>%<br/>
+        <span id="lblDureeRestanteBatteries" st></span>
+        <span id="lblValeurDureeRestanteBatteries"></span><br/>
+        <span id="lblCodeIncidentEnergie" st></span>
+        <span id="lblValeurCodeIncidentEnergie"></span><br/><br/>
+        </div>
+    </div>
+    
+    <div id="popInfoNasa" data-role="popup" data-theme="a">
+        <div class="centrer">
+            <h1 id="msgPopNasa" st></h1><br/>
+        </div>
+        <div class="centrer">
+            Dr Bruce Banerdt : InSightProject Investigator<br/>
+            Tom Hoffman : Chef de projet InSight<br/><br/>
+        </div>
+        <br/>
+    </div>
+
+    <div id="popInfoCnes" data-role="popup" data-theme="a">
+        <div class="centrer">
+            <h1 id="msgPopCnes" st></h1><br/>
+            Dr Philippe Laudet : Chef de projet SEIS pour INSIGHT<br/>
+            Alain Gaboriaud : Responsable du développement d’ELYSIUM<br/>
+            Patrice Amoyel : Graphiste<br/>
+            <br/>
+        </div>
+    </div>
+
+    <div id="popFilmElysium" data-role="popup" data-theme="a">
+        <div class="centrer">
+            <div id="divFilm">
+                <video id="vidPopFilm" controls class="show">
+                    <source src="images/elysiumfilm.mp4" type="video/mp4">
+                </video>
+            </div>
+            <div id="cmdFilm" class="hide">
+                <button id="btnCmdVideoPanneaux" st class="ui-btn ui-btn-b"></button>
+                <button id="btnCmdVideoSEIS" st class="ui-btn ui-btn-b"></button>
+                <button id="btnCmdVideoWTS" st class="ui-btn ui-btn-b"></button>
+                <button id="btnCmdVideoHP3" st class="ui-btn ui-btn-b"></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="popInfoAcToulouse" data-role="popup" data-theme="a">
+        <div class="centrer">
+        <h1 id="msgPopAcToulouse" st>Remerciements</h1><br/>
+            Carol Darrault : IA - IPR<br/>
+            Jacqueline Fabre : Ingénieur pour l'Ecole<br/>
+            Stéphane Rivola, Sabine Canceill, Géraldine Lavabre,<br/>
+            Guy Aldebert, Jean Moucaud : Chefs de Travaux<br/><br/>
+            Laurent Coste : Professeur Intégrateur<br/>
+            Joël Voyé, Jean-Pierre Dumas : Professeurs Responsables Informatique<br/>
+            Ducommun Claire : Professeur Traducteur Anglais<br/>
+            Diez Isabelle : Traducteur Espagnol<br/>
+            Haag Siegfried : Traducteur Allemand<br/><br/>
+            ALBI (Louis Rascol) : Panneaux Solaires, SEIS<br/>
+            BAGNERES DE BIGORRE (Victor Duruy) : Bras, Energie<br/>
+            CAHORS (Gaston Monerville) : Energie<br/>
+            COLOMIERS (Victor Hugo) : Accessoires, Bras, IHM, Supervision <br/>
+            DECAZEVILLE (La Découverte) : Platine, Corps, Pieds, Panneaux Solaires<br/>
+            MIREPOIX (Lycée de Mirepoix) : Bras, SEIS<br/>
+            SAINT AFFRIQUE (Jean Jaurès) : Energie, Panneaux Solaires<br/>
+            SAINT ORENS (Pierre Paul Riquet) : Accessoires, Bras, HP3<br/>
+            TARBES (Jean Dupuy) : WTS<br/>
+            TOULOUSE (Stéphane Hessel) : Bras<br/>
+            TOULOUSE (Guynemer): Panneaux Solaires<br/>
+            <br/>
+        </div>
+    </div>
+
+<!--
+    ===============================================================
+     popup globales avec ouverture non modale générant des actions
+    ===============================================================
+-->
+    <div id="popLangue" data-role="popup" data-theme="a">
+        <h1 id="msgPopLangue" st class="centrer"></h1><br/>
+        <button id="btnPopFrancais" class="ui-btn ui-btn-b">Français</button>
+        <button id="btnPopAnglais" class="ui-btn ui-btn-b">English</button>
+        <button id="btnPopEspagnol" class="ui-btn ui-btn-b">Español</button>
+        <button id="btnPopAllemand" class="ui-btn ui-btn-b">Deutsch</button>
+    </div>
+
+    <div id="popCamera" data-role="popup" data-position-to="#imgCamera" data-theme="a">
+        <button id="btnPopCameraChangeVue" st class="ui-btn ui-btn-b"></button>
+        <button id="btnPopCameraShowGraphe" st="0" class="ui-btn ui-btn-b"></button>
+        <button id="btnPopCameraHideVideo" st class="ui-btn ui-btn-b"></button>
+    </div>
+
+    <div id="popFilm" data-role="popup" data-position-to="#vidFilm" data-theme="a">
+        <button id="btnPopVideoChangeVue" st class="ui-btn ui-btn-b"></button>
+        <button id="btnPopVideoPanneaux" st class="ui-btn ui-btn-b"></button>
+        <button id="btnPopVideoSEIS" st class="ui-btn ui-btn-b"></button>
+        <button id="btnPopVideoWTS" st class="ui-btn ui-btn-b"></button>
+        <button id="btnPopVideoHP3" st class="ui-btn ui-btn-b"></button>
+        <button id="btnPopVideoHideVideo" st class="ui-btn ui-btn-b"></button>
+        <button id="btnPopVideoShowGraphe" st="0" class="ui-btn ui-btn-b"></button>
+    </div>
+
+    <div id="popGraphes" data-role="popup" data-position-to="#divGraphe" data-theme="a">
+        <button id="btnPopChangeVue" st class="ui-btn ui-btn-b"></button>
+        <button id="btnPopGrapheReset" st class="ui-btn ui-btn-b"></button>
+        <button id="btnPopGrapheStart" st="0" class="ui-btn ui-btn-b"></button>
+        <button id="btnPopHideGraphe" st class="ui-btn ui-btn-b"></button>
+        <button id="btnPopHideVideo" st="0" class="ui-btn ui-btn-b"></button>
+    </div>
+
+    <div id="popCommande" data-role="popup" data-theme="a">
+        <h1 id="msgPopCommande" st="1" class="centrer"></h1><br/>
+        <fieldset class="ui-grid-a">
+            <div class="ui-block-a">
+                <button id="btnPopCommandeOK" st class="ui-btn ui-btn-b"></button>
+            </div>
+            <div class="ui-block-b">
+                <button id="btnPopCommandeNO" st class="ui-btn ui-btn-b"></button>
+            </div>
+        </fieldset>
+    </div>
+
+    <!-- panel de depannage -->
+    <div id="popDepannage" data-role="popup" data-theme="a">
+        <h1 class="centrer">Boite à Outils</h1>
+        <!-- voir elysium.js btnPopDecision(ok) pour ref des valeurs
+            maj : fichiers lang.json
+            maj elysium.js : btnDepannageDecision(ok)
+        -->
+        <fieldset class="ui-grid-a">
+            <div class="ui-block-a">
+                <button id="btnOutils3" onclick="ihm.dmdDepannageDecision(3);" st class="ui-btn ui-btn-b">Lancer Mesures SEIS</button>
+            </div>
+            <div class="ui-block-b">
+                <button id="btnOutils2" onclick="ihm.dmdDepannageDecision(2);" st class="ui-btn ui-btn-b">Arrêt Mesures SEIS</button>
+            </div>
+        </fieldset>
+        <fieldset class="ui-grid-a">
+            <div class="ui-block-a">
+                <button id="btnOutils6" onclick="ihm.dmdDepannageDecision(6);" st class="ui-btn ui-btn-b">Fin Nivellement SEIS</button>
+            </div>
+            <div class="ui-block-b">
+                <button id="btnOutils4" onclick="ihm.dmdDepannageDecision(4);" st class="ui-btn ui-btn-b">Replier Pieds SEIS</button>
+            </div>
+        </fieldset>
+        <fieldset class="ui-grid-a">
+            <div class="ui-block-a">
+                <button id="btnOutils5" onclick="ihm.dmdDepannageDecision(5);" st class="ui-btn ui-btn-b">Panneaux HS</button>
+            </div>
+            <div class="ui-block-b">
+                <button id="btnOutils1" onclick="ihm.dmdDepannageDecision(1);" st class="ui-btn ui-btn-b">Arrêt du système</button>
+            </div>
+        </fieldset>
+    </div>
+
+    </body>
+</html>

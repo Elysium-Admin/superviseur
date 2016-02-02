@@ -1,0 +1,5 @@
+Ce module indépendant "Température" permet de sruveiller la température  à l'interieur du Lander
+ mais aussi sur le plateau du Landeur ou se trouve la borne Wifi
+
+Il utilise les ressources I2c de la raspberry qui doivent forcement être activées.. (voir le manuel
+ d'installation)

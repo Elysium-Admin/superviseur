@@ -1,0 +1,7 @@
+#!/bin/sh
+programme="./rejouer "$1
+echo $programme
+Terminal  --disable-server --geometry=126x16 --default-working-directory=./projet -T="REJOUEUR" -H --hide-menubar -x $programme  &
+sleep 2
+Terminal  --disable-server --geometry=126x33 --default-working-directory=./outils -T="ANALYSEUR" -e=./playeur -H --hide-menubar &
+

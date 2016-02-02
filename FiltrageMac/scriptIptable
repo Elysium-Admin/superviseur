@@ -1,0 +1,54 @@
+#! /bin/bash
+DIR_FILTRE="/home/pi/Elysium/FiltrageMac"
+iptables -t filter -X
+#Interdire toute connexion entrante et sortante
+iptables -t filter -P INPUT DROP
+iptables -t filter -P FORWARD DROP
+iptables -t filter -P OUTPUT ACCEPT 
+# Ne pas casser les connexions etablies
+iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+#iptables -A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+# Autoriser loopback
+iptables -t filter -A INPUT -i lo -j ACCEPT
+#iptables -t filter -A OUTPUT -o lo -j ACCEPT
+#autoriser les automates
+iptables -A  INPUT -s 10.5.129.100 -J ACCEPT
+iptables -A  INPUT -s 10.5.129.101 -J ACCEPT
+iptables -A  INPUT -s 10.5.129.102 -J ACCEPT
+iptables -A  INPUT -s 10.5.129.24 -J ACCEPT
+
+#autoriser les pc de maintenance
+iptables -A  INPUT -m mac --mac-source 44:8a:5b:f0:0d:fa  -J ACCEPT
+iptables -A  INPUT -m mac --mac-source 40:e2:30:2f:ee:d2  -J ACCEPT
+iptables -A  INPUT -m mac --mac-source 60:02:b4:67:07:73  -J ACCEPT
+iptables -A  INPUT -m mac --mac-source 0c:54:a5:2a:e9:29  -J ACCEPT
+iptables -A  INPUT -m mac --mac-source 70.f1:a1:53:d3:d6  -J ACCEPT
+iptables -A  INPUT -m mac --mac-source 70:5a:b6:bf:d2:70  -J ACCEPT
+
+
+# Autoriser DNS
+#iptables -t filter -A OUTPUT -p tcp --dport 53 -j ACCEPT
+#iptables -t filter -A OUTPUT -p udp --dport 53 -j ACCEPT
+iptables -t filter -A INPUT -p tcp --dport 53 -j ACCEPT
+iptables -t filter -A INPUT -p udp --dport 53 -j ACCEPT
+# Autoriser SSH
+iptables -t filter -A INPUT -p tcp --dport 22 -j ACCEPT
+#iptables -t filter -A OUTPUT -p tcp --dport 22 -j ACCEPT
+
+# Autoriser HTTP
+#iptables -t filter -A OUTPUT -p tcp --dport 80 -j ACCEPT
+iptables -t filter -A INPUT -p tcp --dport 80 -j ACCEPT
+# Autoriser le ping
+iptables -t filter -A INPUT -p icmp -j ACCEPT
+#iptables -t filter -A OUTPUT -p icmp -j ACCEPT
+#NTP Out
+#iptables -t filter -A OUTPUT -p udp --dport 123 -j ACCEPT
+#Règles Perso
+iptables -t filter -A INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+iptables -t filter -A INPUT -m mac --mac-source 0C:54:A5:2A:E9:29  -j ACCEPT
+sed -i 's/\r//g' $DIR_FILTRE/MacAuthorises
+while read line
+do 
+	iptables -A INPUT -p tcp -m tcp --dport 2015 -j ACCEPT -m mac --mac-source $line
+  echo "iptables -A INPUT -p tcp -m tcp --dport 2015 -j ACCEPT -m mac --mac-source "$line
+done < $DIR_FILTRE/MacAuthorisees

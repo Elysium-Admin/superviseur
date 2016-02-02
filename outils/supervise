@@ -1,0 +1,6 @@
+#!/bin/sh
+cd /home/pi/Elysium/outils/scripts
+sudo ./stopSuperviseur 
+sleep 1
+cd /home/pi/Elysium/supervision
+./prgDeSupervision &

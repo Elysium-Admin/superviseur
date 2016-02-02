@@ -1,0 +1,103 @@
+#include "../defs/ICMP.h"
+
+ICMP::ICMP()
+{
+}
+
+int ICMP::ping(string ip, u_char tempsMax)
+{
+	// Création de la socket
+	int sock = socket(AF_INET,SOCK_DGRAM,IPPROTO_ICMP);
+	if (sock < 0)
+	{
+		return PING_ERROR | PING_CREATE;
+	}
+
+    // Création de la structure sockaddr_in
+    struct sockaddr_in addr;
+	memset(&addr, 0, sizeof addr);
+	addr.sin_family = AF_INET; // Mode IPv4
+	addr.sin_addr.s_addr = inet_addr( ip.c_str() ); // On assigne l'IP du destinataire
+
+    // Création de la structure du packet ICMP
+    struct icmphdr icmp_hdr;
+	memset(&icmp_hdr, 0, sizeof icmp_hdr);
+	icmp_hdr.type = ICMP_ECHO; // On envoie un packet de PING
+	icmp_hdr.un.echo.id = 1234; // ID d'échange arbitraire
+
+    // Déclaration de variables
+	unsigned char data[2048];
+	int rc;
+	fd_set read_set;
+	socklen_t slen;
+	struct icmphdr rcv_hdr;
+
+    icmp_hdr.un.echo.sequence = 0;
+	memcpy(data, &icmp_hdr, sizeof icmp_hdr);
+	memcpy(data + sizeof icmp_hdr, "helloCamera", 5); // Texte à envoyer pour le test du ping
+	rc = sendto(sock, data, sizeof icmp_hdr + 5, 0, (struct sockaddr*)&addr, sizeof addr);
+	if (rc <= 0)
+	{
+	    // Erreur lors de l'envoi du packet ICMP sur le réseau
+cout <<""<<endl;
+		close(sock);
+		return PING_ERROR | PING_SEND;
+	}
+
+	memset(&read_set, 0, sizeof read_set); // On met tous les bits à 0 de read_set
+	FD_SET(sock, &read_set);
+
+	// On attend une réponse avec un système de TIMEOUT
+	struct timeval timeout = {tempsMax, 0}; // Attente de tempsMax seconde(s)
+	rc = select(sock + 1, &read_set, NULL, NULL, &timeout);
+	if (rc == 0)
+	{
+	    // On est arrivé au TIMEOUT
+cout <<"PING_ERROR | PING_TIMEOUT"<<endl;
+                close(sock);
+		return PING_ERROR | PING_TIMEOUT;
+	}
+	else if (rc < 0)
+	{
+	    // La création du TIMEOUT est impossible
+cout <<"PING_ERROR | PING_CREATE_TIMEOUT"<<endl;
+                close(sock);
+		return PING_ERROR | PING_CREATE_TIMEOUT;
+	}
+
+	slen = 0;
+	rc = recvfrom(sock, data, sizeof data, 0, NULL, &slen); // On attend le packet de réponse
+	if (rc <= 0)
+	{
+		// Erreur réeception du packet ICMP
+cout <<"PING_ERROR | PING_RECEIVE"<<endl;
+                close(sock);
+		return PING_ERROR | PING_RECEIVE;
+	}
+	else if (rc < sizeof rcv_hdr)
+	{
+		// Packet trop petit
+cout <<"PING_ERROR | PING_TOO_SMALL"<<endl;
+                close(sock);
+		return PING_ERROR | PING_TOO_SMALL;
+	}
+	memcpy(&rcv_hdr, data, sizeof rcv_hdr);
+	if (rcv_hdr.type == ICMP_ECHOREPLY)
+	{
+	    // Le ping est revenu
+cout <<"PING_OK"<<endl;
+                close(sock);
+		return PING_OK;
+	}
+	else
+	{
+		// Ce n'est pas un packet de réponse au ping
+cout <<" PING_ERROR | PING_INVALID"<<endl;
+                close(sock);
+		return PING_ERROR | PING_INVALID;
+	}
+
+cout <<"PING_ERROR"<<endl;
+    close(sock);
+    return PING_ERROR; // On renvoie une erreur si on arrive à la fin de l'algorithme
+}

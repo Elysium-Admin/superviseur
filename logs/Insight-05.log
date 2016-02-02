@@ -1,0 +1,22 @@
+00h00mn00s007862us [ INFO SUPERVISEUR::KERNEL ]  Supervision prete à être lancée 
+00h00mn00s008328us [ INFO SUPERVISEUR::INTERPRETER_CMD_SPECIALES ]  interpréteur commande spéciale actif
+00h00mn00s008543us [ DBG  ProxySEIS::seDeconnecter() ]   Deconnexion du SEIS faite
+00h00mn00s008826us [ INFO SUPERVISEUR::KERNEL ]  ++++ On entre dans le mode ATTENTE ++++
+00h00mn00s009058us [ INFO SUPERVISEUR::INTERPRETER_CMD_NORMALES ]  interpréteur de commandes normales actif
+e00;00;00;1e;00000000;00000000;00;00000000;00;00;00;00000000;00;00;00000000;0000;0000;0000;0000;0000;00;000
+
+00h00mn00s009391us [ DBG  ETATS::SET_ETAT_PANNEAUX ] recu en parametre :64 ( 0x40) , donne 'Etat Panneaux' : 170 (0x0)
+00h00mn00s009518us [ INFO SUPERVISEUR::KERNEL ]   etats ATTENTE initialisé
+00h00mn00s009614us [ INFO SUPERVISEUR::KERNEL ]   setEtatSysteme=Etats::ATTENTE 
+00h00mn00s009715us [ INFO  Superviseur::DemandeIHM() ]  demande 0x00000080
+00h00mn00s009800us [ INFO SUPERVISEUR::DEMANDE_IHM ]  demande IHM
+00h00mn00s009892us [ INFO  ProxySEIS::ReceptionEnvoiSEIS ]  l'écoute du SEIS est active
+00h00mn00s009983us [ INFO  ProxySEIS::ReceptionEnvoiSEIS ]  Attente de la connexion au SEIS
+00h00mn00s010568us [ INFO SUPERVISEUR::SURVEILLANCE_ARRU ]  La surveillance des Arrets d'Urgences est active
+00h00mn00s010829us [ INFO SUPERVISEUR::INSCRIPTION_CLIENTS ] le service d'inscription des Clients est actif
+00h00mn00s011013us [ INFO SUPERVISEUR::DIFFUSER ] le service de diffusion est actif
+00h00mn00s011133us [ INFO SUPERVISEUR::RECEPTION_CMDS ]  l'écoute commande active
+00h00mn00s011256us [ DBG  SUPERVISEUR::RECEPTION_CMDS ] ancienne commande effacée
+00h00mn00s011363us [ INFO SUPERVISEUR::SURVEILLANCE_ENERGIE ]  surveillance énergie active
+e00;00;00;9e;000007c0;00000080;01;00000000;01;01;aa;00000000;00;00;00000000;0000;0000;0000;0000;0000;00;000
+

@@ -1,0 +1,23 @@
+#! /bin/bash
+DIR_FILTRE="/home/pi/Elysium/FiltrageMac"
+#On enlève tous les caractères indésirables
+sed -i 's/\r//g' $DIR_FILTRE/MacAuthorisees
+#Variable contenant le paramètre rentré par l'utilisateur
+
+mac=`echo $1 | tr [:upper:] [:lower:]` 
+#Vérification que la variable sois bien une adresse MAC
+if [[ $mac =~ ^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$ ]]
+then
+	grep "$mac" $DIR_FILTRE/MacAuthorisees
+	if [ "$?" = 0 ]
+	then
+		#On retire l'adresse MAC du fichier	
+		sed -i -e "\#${mac}#d" $DIR_FILTRE/MacAuthorisees
+		iptables -D INPUT -p tcp -m tcp --dport 2015 -j ACCEPT -m mac --mac-source $mac
+		echo "Adresse retirée avec succès"
+	else
+		echo "Adresse MAC non existante dans /home/pi/FiltrageMac/MacAuthorise"
+	fi
+else
+	echo "Le format est incorrect"
+fi

@@ -1,0 +1,6 @@
+#!/bin/sh
+cmd=$(ps -A | grep prgDeSupervi | awk '{print $1 }')
+# echo "cmd="$cmd
+sudo kill -9 $cmd
+
+

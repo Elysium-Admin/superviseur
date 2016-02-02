@@ -1,0 +1,43 @@
+dans ce dossier  il y a plusieurs outils de maintenance
+========================================================
+
+ 4 des programmes compilés :
+****************************
+simucgistream	: Il permet de s'inrrire en temps que CONFERENCIER auprès du superviseur SANS passer par les serveurs web et leurs CGI
+		  il fonctione qu'en mode graphique et doit être lancé APRES que le superviseur soit actif (car il  ouvre une socket
+		  cliente TCP vers le serveur), il necessite la resource "analyseur.o" qui permet de faire un affichage interpretés
+		  de ce que le superviseur diffuse aux clients
+
+simucgicmd	: Il permet d'envoyer des commandes au superviseur, à partir d'uen ocket UDP, il permet non seulement d'envoyer au
+		  superviseur toutes les commandes d'un client "CONFENRENCIER" classique mais aussi des commandes "spéciales" pour 
+		  la maintenance, comme les ouvertures ou fermetures forcées de la pince
+
+rejouer		: Il permet de relire un fichier log tout en renvoyant les trames dans un "pipe" qui a l'autre bout doit être ouvert
+		  par le programme "playeur" chargé d'afficher ces trames sur l'analyseur. avec quelques actions rudimentaires sur
+		  le clavier on peut 'jouer' sur trois mode :
+			- mode trame d'état en trame d'état (on appuie à chaque trame la surla fleche vers le bas pour passer
+					 à la suivante)
+			- mode ligne enligne (on appuie sur la touche espace pour passer à la ligne suivante)
+			- mode automatique (on appuie surla touhe 'fin' et ca se joue automatiquement 
+		  Toute pression sur une de ces touches fait passer instantanément dans le mode correspondant à la touche quel
+		  que fut le mode précédant, on peut ainsi aisémenent changer de mode en cours de "rejoue" du log
+
+playeur		: Il recoit les trame dans le "pipe" créé par le "joueur", à ce titre il doit être forcément lancé APRES le 'joueur'.
+		  Pour fonctionner il nécessite la ressource "analyseur".
+
+
+ 1 script d'usage :
+*******************
+StartReplay	: Ce script doit êter suivi du nom du fichier log à rejouer.
+		  il lance automatiquement les programmes "rejoue" et "playeurs" chacun dans un terminal différant et dans le bon ordre.
+		  ATTENTION: bien s'assurer que ce script soit rendu "exécutable , pour le faie  taper la commande :
+			[user]$ chmod +x StartReplay
+		  Exemple d'usage
+			[user]$ ./StartReplay test11
+
+
+
+Compilation : Le makefile compile l'ensemble des 4 programmes, mais il nécessite que le make du dossier "projet" est été fait au préalable 
+------------	car il utilise le fichier objet 'socket.o' créé à la compilation du dossier projet.
+		C'est un usage usuel du makefile : 
+			[user]$ make
